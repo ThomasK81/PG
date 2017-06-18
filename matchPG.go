@@ -18,9 +18,9 @@ type Version struct {
   Title []string
 }
 
-func main() {
+func loadCSV(s string) Version{
   var output Version
-  data, err := ioutil.ReadFile("data/pg.Vol.-1.coo.31924054872803_ocr.csv")
+  data, err := ioutil.ReadFile(s)
   if err != nil {
     fmt.Println(err)
   }
@@ -43,5 +43,12 @@ func main() {
     output.Other = append(output.Other, line[4])
     output.Title = append(output.Title, line[5])
 	}
-  fmt.Println(output.Title)
+  return output
+}
+
+func main() {
+  output := loadCSV("data/pg.Vol.-1.coo.31924054872803_ocr.csv")
+  output2 := loadCSV("data/pg.Vol.-1.hvd.32044015466733_ocr.csv")
+  fmt.Println(output.Id[2])
+  fmt.Println(output2.Id[2])
 }
