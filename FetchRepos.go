@@ -58,10 +58,11 @@ func main() {
     reponame = append(reponame, repos[i].Name)
   }
   cmd := "./test"
-  args := []string{reponame[40]}
-  if err := exec.Command(cmd, args...).Run(); err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
-	}
-	fmt.Println("Successfully called ./test")
+  for i := len(reponame)-1; i >= 0; i-- {
+    args := []string{reponame[i]}
+    if err := exec.Command(cmd, args...).Run(); err != nil {
+      fmt.Fprintln(os.Stderr, err)
+      os.Exit(1)
+    }
+    fmt.Println("Successfully called ./test", reponame[i])}
 }
