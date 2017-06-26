@@ -79,7 +79,7 @@ func main() {
 			start = j - 200
 		}
 		switch {
-		case j + 200 > len(output2.Text) - 1:
+		case j + 200 >= len(output2.Text) - 1:
 			end = len(output2.Text) - 1
 		default:
 			end = j + 200
