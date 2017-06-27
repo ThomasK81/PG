@@ -2,18 +2,18 @@ package main
 
 import (
 	"encoding/json"
-  "fmt"
-  "io/ioutil"
-  "net/http"
-  "os/exec"
-  "os"
+	"fmt"
+	"io/ioutil"
+	"net/http"
+	"os"
+	"os/exec"
 	"path/filepath"
 	"regexp"
 	"strings"
 )
 
 type Repo struct {
-	Name   string `json:"name"`
+	Name string `json:"name"`
 }
 
 func findRepos(s string) []Repo {
@@ -51,26 +51,28 @@ func getContent(url string) ([]byte, error) {
 }
 
 func main() {
-  var reponame []string
-  repos := findRepos("https://api.github.com/users/OGL-PatrologiaGraecaDev/repos?per_page=100")
-  for i:= range repos {
-    reponame = append(reponame, repos[i].Name)
-  }
-  repos = findRepos("https://api.github.com/users/OGL-PatrologiaGraecaDev/repos?per_page=100&page=2")
-  for i:= range repos {
-    reponame = append(reponame, repos[i].Name)
-  }
-  cmd := "./test"
+	extra := []string{"Vol.-86.1", "Vol.-86.2", "Vol.-87.1", "Vol.-87.2", "Vol.-87.3"}
+	var reponame []string
+	repos := findRepos("https://api.github.com/users/OGL-PatrologiaGraecaDev/repos?per_page=100")
+	for i := range repos {
+		reponame = append(reponame, repos[i].Name)
+	}
+	repos = findRepos("https://api.github.com/users/OGL-PatrologiaGraecaDev/repos?per_page=100&page=2")
+	for i := range repos {
+		reponame = append(reponame, repos[i].Name)
+	}
+	cmd := "./test"
 	storedfiles := checkExt(".csv")
 	reponame = removefromRepo(reponame, storedfiles)
-
-  for i := len(reponame)-1; i >= 0; i-- {
-    args := []string{reponame[i]}
-    if err := exec.Command(cmd, args...).Run(); err != nil {
-      fmt.Fprintln(os.Stderr, err)
-      os.Exit(1)
-    }
-    fmt.Println("Successfully called ./test", reponame[i])}
+	reponame = removefromRepo(reponame, extra)
+	for i := len(reponame) - 1; i >= 0; i-- {
+		args := []string{reponame[i]}
+		if err := exec.Command(cmd, args...).Run(); err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			os.Exit(1)
+		}
+		fmt.Println("Successfully called ./test", reponame[i])
+	}
 }
 
 func checkExt(ext string) []string {
@@ -83,7 +85,7 @@ func checkExt(ext string) []string {
 		if !f.IsDir() {
 			r, err := regexp.MatchString(ext, f.Name())
 			if err == nil && r {
-        filename := strings.Join([]string{strings.Split(f.Name(), ".")[1], strings.Split(f.Name(), ".")[2]}, ".")
+				filename := strings.Join([]string{strings.Split(f.Name(), ".")[1], strings.Split(f.Name(), ".")[2]}, ".")
 				files = append(files, filename)
 			}
 		}
@@ -93,19 +95,19 @@ func checkExt(ext string) []string {
 }
 
 func removeDuplicatesUnordered(elements []string) []string {
-    encountered := map[string]bool{}
+	encountered := map[string]bool{}
 
-    // Create a map of all unique elements.
-    for v:= range elements {
-        encountered[elements[v]] = true
-    }
+	// Create a map of all unique elements.
+	for v := range elements {
+		encountered[elements[v]] = true
+	}
 
-    // Place all keys from the map into a slice.
-    result := []string{}
-    for key, _ := range encountered {
-        result = append(result, key)
-    }
-    return result
+	// Place all keys from the map into a slice.
+	result := []string{}
+	for key, _ := range encountered {
+		result = append(result, key)
+	}
+	return result
 }
 
 func removefromRepo(input, control []string) []string {
@@ -114,15 +116,15 @@ func removefromRepo(input, control []string) []string {
 		if strcontains(control, input[i]) == false {
 			result = append(result, input[i])
 		}
-		}
-		return result
+	}
+	return result
 }
 
 func strcontains(s []string, e string) bool {
-    for _, a := range s {
-        if a == e {
-            return true
-        }
-    }
-    return false
+	for _, a := range s {
+		if a == e {
+			return true
+		}
+	}
+	return false
 }
