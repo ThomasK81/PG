@@ -190,7 +190,8 @@ func testsimilarity(textversion2 Textversion, textversion Textversion, window in
 }
 
 func main() {
-	window := 300
+	usernumber, _ := strconv.Atoi(os.Args[1])
+	window := 600
 	files, _ := ioutil.ReadDir("./data/")
 	matchingnames := []string{}
 
@@ -202,34 +203,32 @@ func main() {
 	}
 	unique := UniqStr(matchingnames)
 
-	for i := range unique {
-		fmt.Println(unique[i])
-		number := unique[i] + "[a-z]"
-		fmt.Println(number)
-		matchingnames = []string{}
-		for _, f := range files {
-			filename := f.Name()
-			matched, _ := regexp.MatchString(number, filename)
-			if matched == true {
-				filename = "data/" + filename
-				matchingnames = append(matchingnames, filename)
-			}
+	fmt.Println(unique[usernumber])
+	number := unique[usernumber] + "[a-z]"
+	fmt.Println(number)
+	matchingnames = []string{}
+	for _, f := range files {
+		filename := f.Name()
+		matched, _ := regexp.MatchString(number, filename)
+		if matched == true {
+			filename = "data/" + filename
+			matchingnames = append(matchingnames, filename)
 		}
-		if len(matchingnames) > 1 {
-			fmt.Println(matchingnames[0])
-			textversion := readPG(matchingnames[0])
-			fmt.Println(matchingnames[1:len(matchingnames)])
-			textcollection := matchingnames[1:len(matchingnames)]
-			var pgCollection []Textversion
-			for i := range textcollection {
-				textversion2 := readPG(textcollection[i])
-				pgCollection = append(pgCollection, textversion2)
-			}
-			fmt.Println("Data is read. Begin testing. This will take a while...")
-			for i := range pgCollection {
-				textversion2 := pgCollection[i]
-				go testsimilarity(textversion2, textversion, window)
-			}
+	}
+	if len(matchingnames) > 1 {
+		fmt.Println(matchingnames[0])
+		textversion := readPG(matchingnames[0])
+		fmt.Println(matchingnames[1:len(matchingnames)])
+		textcollection := matchingnames[1:len(matchingnames)]
+		var pgCollection []Textversion
+		for i := range textcollection {
+			textversion2 := readPG(textcollection[i])
+			pgCollection = append(pgCollection, textversion2)
+		}
+		fmt.Println("Data is read. Begin testing. This will take a while...")
+		for i := range pgCollection {
+			textversion2 := pgCollection[i]
+			go testsimilarity(textversion2, textversion, window)
 		}
 	}
 	var input string
