@@ -4,12 +4,12 @@ import (
 	"encoding/csv"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"log"
 	"os"
+	"regexp"
 	"strconv"
 	"strings"
-	"io/ioutil"
-	"regexp"
 )
 
 type Textversion struct {
@@ -215,19 +215,21 @@ func main() {
 				matchingnames = append(matchingnames, filename)
 			}
 		}
-		fmt.Println(matchingnames[0])
-		textversion := readPG(matchingnames[0])
-		fmt.Println(matchingnames[1:len(matchingnames)])
-		textcollection := matchingnames[1:len(matchingnames)]
-		var pgCollection []Textversion
-		for i := range textcollection {
-			textversion2 := readPG(textcollection[i])
-			pgCollection = append(pgCollection, textversion2)
-		}
-		fmt.Println("Data is read. Begin testing. This will take a while...")
-		for i := range pgCollection {
-			textversion2 := pgCollection[i]
-			go testsimilarity(textversion2, textversion, window)
+		if len(matchingnames) > 1 {
+			fmt.Println(matchingnames[0])
+			textversion := readPG(matchingnames[0])
+			fmt.Println(matchingnames[1:len(matchingnames)])
+			textcollection := matchingnames[1:len(matchingnames)]
+			var pgCollection []Textversion
+			for i := range textcollection {
+				textversion2 := readPG(textcollection[i])
+				pgCollection = append(pgCollection, textversion2)
+			}
+			fmt.Println("Data is read. Begin testing. This will take a while...")
+			for i := range pgCollection {
+				textversion2 := pgCollection[i]
+				go testsimilarity(textversion2, textversion, window)
+			}
 		}
 	}
 	var input string
