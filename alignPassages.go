@@ -113,21 +113,31 @@ func readPG(file string) Textversion {
 }
 
 func testsimilarity(textversion2 Textversion, textversion Textversion, window int) {
+	startwindow := window + 0
 	filename := "Vol" + textversion.Volume[0] + "_" + textversion.Version[0] + "_matchedWith_" + textversion2.Version[0] + ".csv"
 	fileOS, _ := os.Create(filename)
 	defer fileOS.Close()
 	writer := csv.NewWriter(fileOS)
 	writer.Comma = '#'
 	defer writer.Flush()
-
+	var starttester int
+	var biggest int
+	var counter int
+	var neg_counter int
 	for tester := range textversion.Text {
-		var starttester int
-		var biggest int
 		switch {
-		case tester < window:
-			starttester = tester + 0
+		case counter > 2:
+			starttester = biggest + 1
+			fmt.Println("Start at:", starttester)
 		default:
-			starttester = tester * len(textversion2.ID) / len(textversion.ID)
+			starttester = tester + 0
+		}
+		switch {
+		case neg_counter > 50:
+			fmt.Println("neg_counter:", neg_counter)
+			window = 2000
+		default:
+			window = startwindow + 0
 		}
 		text := textversion.Text[tester]
 		scores := []float64{}
@@ -183,15 +193,20 @@ func testsimilarity(textversion2 Textversion, textversion Textversion, window in
 			writer.Write([]string{textversion.ID[tester], textversion2.ID[biggest], strconv.FormatFloat(n, 'f', 3, 32)})
 			fmt.Println("------------------------------------")
 			fmt.Println("Tested:", pertested, "%")
+			counter = counter + 1
+			neg_counter = 0
+
 		default:
 			writer.Write([]string{textversion.ID[tester], "", strconv.FormatFloat(0.0, 'f', 3, 32)})
+			counter = 0
+			neg_counter = neg_counter + 1
 		}
 	}
 }
 
 func main() {
 	usernumber, _ := strconv.Atoi(os.Args[1])
-	window := 600
+	window := 300
 	files, _ := ioutil.ReadDir("./data/")
 	matchingnames := []string{}
 
